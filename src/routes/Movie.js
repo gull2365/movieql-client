@@ -2,17 +2,6 @@ import { gql, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 
-const GET_MOVIE = gql`
-  query getMovie($movieId: String!) {
-    movie(id: $movieId) {
-      id
-      title
-      medium_cover_image
-      rating
-    }
-  }
-`;
-
 const Container = styled.div`
   height: 100vh;
   background-image: linear-gradient(-45deg, #d754ab, #fd723a);
@@ -52,6 +41,18 @@ const Image = styled.div`
   border-radius: 7px;
 `;
 
+const GET_MOVIE = gql`
+  query getMovie($movieId: String!) {
+    movie(id: $movieId) {
+      id
+      title
+      medium_cover_image
+      rating
+      isLiked @client
+    }
+  }
+`;
+
 export default function Movie() {
   const { id } = useParams();
   const { data, loading } = useQuery(GET_MOVIE, {
@@ -59,11 +60,13 @@ export default function Movie() {
       movieId: id,
     },
   });
+
   return (
     <Container>
       <Column>
         <Title>{loading ? "Loading..." : `${data.movie?.title}`}</Title>
         <Subtitle>⭐️ {data?.movie?.rating}</Subtitle>
+        <button>{data?.movie?.isLiked ? " unlike" : "Like"}</button>
       </Column>
       <Image bg={data?.movie?.medium_cover_image} />
     </Container>
